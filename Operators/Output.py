@@ -37,8 +37,16 @@ class KEYS_OT_output(bpy.types.Operator):
         # Get selected Grease Pencil object
         gp_object = bpy.context.object
         if not gp_object or gp_object.type != 'GPENCIL':
-            self.report({'ERROR'}, "Please select a Grease Pencil object.")
-            return {'CANCELLED'}
+            # Attempt to select the first GPENCIL object in the scene
+            for obj in bpy.data.objects:
+                if obj.type == 'GPENCIL':
+                    bpy.context.view_layer.objects.active = obj
+                    gp_object = obj
+                    break
+
+            if not gp_object or gp_object.type != 'GPENCIL':
+                self.report({'ERROR'}, "Please select a Grease Pencil object.")
+                return {'CANCELLED'}
 
         # Get Grease Pencil layers
         gpencil_data = gp_object.data
